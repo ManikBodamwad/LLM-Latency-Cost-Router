@@ -1,0 +1,19 @@
+# Environments
+.env
+.venv
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# VS Code
+.vscode/
+
+# Ignore Docker volume mounts if any
+*.sqlite3
+*.db
