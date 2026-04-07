@@ -4,8 +4,6 @@ A production-grade, highly resilient API Gateway that dynamically routes Large L
 
 Built strictly with **Site Reliability Engineering (SRE)** principles, it implements automated failovers, Redis-backed rate limiters, token-cost telemetry routing to Prometheus, and features a glowing, immersive UI dashboard built beautifully in Vanilla JS/Vite.
 
-![Agentic Gateway UI](https://github.com/user-attachments/assets/demo-ui)
-
 ## 🚀 Core SRE Features
 
 - **Dynamic Tier Routing**: Uses a heuristics engine to parse prompt intent. Simple queries route to blazing-fast models (`groq/llama-3.1-8b`), while complex queries (e.g. system design) automatically route to heavy models (`groq/llama-3.1-70b`).
@@ -46,11 +44,13 @@ Built strictly with **Site Reliability Engineering (SRE)** principles, it implem
 4. **Experience the Application:**
    Open [http://localhost:5173](http://localhost:5173) in your web browser. Type a complex prompt like *"Can you explain the Medallion Architecture?"* and observe the SRE dashboard dynamically tracking the latency, the exact Token Cost, and the routing strategy in real-time.
 
-## 📊 Viewing The Internal Observability Stack
+## 📊 View Local Development Telemetry
 
-In addition to the Vite dashboard, you can view the true raw metric stream exactly as an enterprise SRE would:
-- **Prometheus Raw Sink**: `http://localhost:9090`
-- **Grafana Workspace**: `http://localhost:3000` (Login: `admin` / `admin`)
+For local visualization during development, the `docker-compose` orchestration automatically spins up standard metrics scrape targets. 
+
+- **Prometheus Scraper UI**: `http://localhost:9090`
+- **Grafana Workspace**: `http://localhost:3000` 
+  *(Note: This uses the default local-dev credentials Login: `admin` / Password: `admin`)*
 
 ---
 
