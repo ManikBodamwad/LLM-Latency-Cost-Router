@@ -44,6 +44,23 @@ Built strictly with **Site Reliability Engineering (SRE)** principles, it implem
 4. **Experience the Application:**
    Open [http://localhost:5173](http://localhost:5173) in your web browser. Type a complex prompt like *"Can you explain the Medallion Architecture?"* and observe the SRE dashboard dynamically tracking the latency, the exact Token Cost, and the routing strategy in real-time.
 
+## 📦 Usage as a Python Package
+
+This repository is built as a portable Python package so engineering teams can inject edge-routing into their own systems natively without bulky Docker containers!
+
+If you install this via pip:
+```bash
+pip install agentic-sre-gateway
+```
+
+You can instantly spin up the SRE-optimized Routing API on your local terminal using the globally injected command:
+```bash
+export GROQ_API_KEY="your_key"
+export REDIS_URL="redis://localhost:6379/0"
+agentic-gateway
+```
+This serves teams that want a drop-in API proxy to massively reduce LLM bills and monitor token consumption locally without rewriting complex LiteLLM and Prometheus wrappers themselves.
+
 ## 📊 View Local Development Telemetry
 
 For local visualization during development, the `docker-compose` orchestration automatically spins up standard metrics scrape targets. 
