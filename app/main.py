@@ -7,8 +7,17 @@ import os
 import hashlib
 import redis.asyncio as redis
 from prometheus_client import make_asgi_app, Counter, Histogram
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="LLM Router API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Initialize Redis client
 redis_client = redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"), decode_responses=True)
@@ -67,12 +76,12 @@ async def chat_completions(req: ChatRequest, api_key: str = Depends(verify_api_k
     tier = determine_complexity(req.prompt)
     
     if tier == "simple":
-        target_model = "gemini/gemini-1.5-flash"
-        fallback_model = "gemini/gemini-1.0-pro"
+        target_model = "groq/llama-3.1-8b-instant"
+        fallback_model = "groq/llama-3.1-8b-instant"
         timeout_seconds = 5.0
     else:
-        target_model = "gemini/gemini-1.5-pro"
-        fallback_model = "gemini/gemini-1.5-flash"  # Fallback to faster model if pro fails
+        target_model = "groq/llama-3.1-70b-versatile"
+        fallback_model = "groq/llama-3.1-8b-instant"  
         timeout_seconds = 10.0
 
     start_time = time.time()
@@ -112,7 +121,11 @@ async def chat_completions(req: ChatRequest, api_key: str = Depends(verify_api_k
             error_type = "timeout" if isinstance(e, asyncio.TimeoutError) else "error_503"
             FAILOVER_COUNT.labels(original_model=target_model, fallback_model=fallback_model, reason=error_type).inc()
             used_model = fallback_model
-            response_stream = await litellm.acompletion(model=fallback_model, messages=messages, timeout=timeout_seconds, stream=True)
+            
+            try:
+                response_stream = await litellm.acompletion(model=fallback_model, messages=messages, timeout=timeout_seconds, stream=True)
+            except Exception as e2:
+                raise HTTPException(status_code=503, detail=f"Core and Fallback LLM failed: {str(e2)}")
 
         async def stream_generator():
             full_text = ""
@@ -144,17 +157,24 @@ async def chat_completions(req: ChatRequest, api_key: str = Depends(verify_api_k
         FAILOVER_COUNT.labels(original_model=target_model, fallback_model=fallback_model, reason=error_type).inc()
         used_model = fallback_model
         
-        # Call fallback
-        response = await litellm.acompletion(
-            model=fallback_model,
-            messages=messages,
-            timeout=timeout_seconds
-        )
+        try:
+            # Call fallback
+            response = await litellm.acompletion(
+                model=fallback_model,
+                messages=messages,
+                timeout=timeout_seconds
+            )
+        except Exception as e2:
+            raise HTTPException(status_code=503, detail=f"LLM Quota Exceeded or fully down: {str(e2)}")
     
     latency = time.time() - start_time
     REQUEST_LATENCY.labels(model=used_model, tier=tier).observe(latency)
     
-    cost = litellm.completion_cost(response) or 0.0
+    try:
+        cost = litellm.completion_cost(completion_response=response, model=used_model) or 0.0
+    except Exception:
+        cost = 0.0
+        
     TOKEN_COST.labels(model=used_model, tier=tier).inc(cost)
     
     # Extract string from response format

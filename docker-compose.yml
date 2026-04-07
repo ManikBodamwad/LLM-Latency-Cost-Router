@@ -9,6 +9,7 @@ services:
       - ./app:/app/app
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
       - REDIS_URL=redis://redis:6379/0
 
   redis:
@@ -33,3 +34,10 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - router_api

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LLM Latency & Cost Router</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <!-- Animated background -->
+    <div class="mesh-bg"></div>
+
+    <div class="app-container">
+      
+      <!-- LEFT SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <i class="ph ph-lightning" style="color: #38BDF8; font-size: 28px;"></i>
+          <h1>Agentic Gateway</h1>
+        </div>
+        <p class="subtitle">Real-time SRE Telemetry & Routing</p>
+        
+        <!-- NEW: Utility Buttons -->
+        <div class="utility-cluster">
+            <a href="http://localhost:3000/dashboards" target="_blank" class="util-btn grafana-btn">
+                <i class="ph-fill ph-chart-line-up"></i> Grafana
+            </a>
+            <a href="http://localhost:9090" target="_blank" class="util-btn prom-btn">
+                <i class="ph-fill ph-database"></i> Prometheus
+            </a>
+        </div>
+        
+        <div class="metrics-grid">
+          
+          <div class="metric-card" id="card-status">
+            <div class="metric-icon"><i class="ph ph-activity"></i></div>
+            <div class="metric-data">
+              <span class="metric-label">Routing Status</span>
+              <span class="metric-value id-status" style="color: #94A3B8; font-size: 1rem;">Waiting...</span>
+            </div>
+          </div>
+
+          <div class="metric-card" id="card-latency">
+            <div class="metric-icon"><i class="ph ph-timer"></i></div>
+            <div class="metric-data">
+              <span class="metric-label">Latency</span>
+              <span class="metric-value"><span class="id-latency">0.0</span> <span class="unit">s</span></span>
+            </div>
+          </div>
+
+          <div class="metric-card" id="card-cost">
+            <div class="metric-icon"><i class="ph ph-coin"></i></div>
+            <div class="metric-data">
+              <span class="metric-label">Token Cost</span>
+              <span class="metric-value" style="color: #FBBF24;">$<span class="id-cost">0.000000</span></span>
+            </div>
+          </div>
+
+          <div class="metric-card" id="card-tier">
+            <div class="metric-icon"><i class="ph ph-brain"></i></div>
+            <div class="metric-data">
+              <span class="metric-label">Complexity Tier</span>
+              <span class="metric-value id-tier">--</span>
+            </div>
+          </div>
+
+          <div class="metric-card" id="card-model">
+            <div class="metric-icon"><i class="ph ph-cpu"></i></div>
+            <div class="metric-data">
+              <span class="metric-label">Model Executed</span>
+              <span class="metric-value id-model" style="font-size: 1.1rem;">--</span>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- RIGHT CHAT AREA -->
+      <main class="chat-area">
+        <div class="chat-container">
+          <div class="chat-messages" id="chat-messages">
+            <!-- Welcome message -->
+            <div class="message assistant">
+              <div class="avatar"><i class="ph ph-robot"></i></div>
+              <div class="content">
+                <strong>Welcome to the SRE Gateway.</strong><br/>
+                I am actively connected to the FastAPI Router. Try asking me a complex system design question, and watch the telemetry sidebar dynamically route the prompt and compute the exact cost and latency!
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input-wrapper">
+            <input type="text" id="prompt-input" placeholder="Type a prompt to test latency and caching..." autocomplete="off"/>
+            <button id="send-btn"><i class="ph-fill ph-paper-plane-right"></i></button>
+          </div>
+        </div>
+      </main>
+
+    </div>
+    
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

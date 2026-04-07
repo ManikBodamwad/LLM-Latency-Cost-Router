@@ -1,47 +1,57 @@
-# LLM Latency & Cost Router
+# Agentic API Gateway | SRE Edge Router
 
-An intelligent API Gateway written in Python (FastAPI) that dynamically routes Large Language Model (LLM) prompts based on complexity and cost. 
+A production-grade, highly resilient API Gateway that dynamically routes Large Language Model (LLM) prompts based on complexity and minimizes cost through semantic caching. 
 
-Built with Site Reliability Engineering (SRE) principles, it automatically provides failovers for API timeouts or downtime, and captures vital usage metrics for Prometheus and Grafana.
+Built strictly with **Site Reliability Engineering (SRE)** principles, it implements automated failovers, Redis-backed rate limiters, token-cost telemetry routing to Prometheus, and features a glowing, immersive UI dashboard built beautifully in Vanilla JS/Vite.
 
-## Features
+![Agentic Gateway UI](https://github.com/user-attachments/assets/demo-ui)
 
-- **Dynamic Routing**: Analyzes prompt length and keywords to route requests. Simple prompts hit fast/cheap models (gemini-1.5-flash), while complex logic routes to capable models (gemini-1.5-pro).
-- **Zero-Latency Semantic Caching**: Powered by Redis, identical prompts skip the LLM entirely, resulting in <5ms latency and $0.00 cost.
-- **Intelligent Failovers**: Wraps primary model calls with strict `asyncio` timeouts. If the primary provider returns an HTTP 503 or hangs, it instantly falls back to a secondary model.
-- **High-Performance Streaming (SSE)**: Supports chunk-by-chunk generator streaming for real-time AI UI rendering, with simultaneous cache write-behind.
-- **API Key Rate Limiting**: Fixed-window token bucket implementation limits users to 50 requests/min via `x-api-key` headers protecting billing loops.
-- **Cost & Latency Tracking**: Integrated `prometheus_client` records total token cost (USD), latency (Histogram), and failure counts, all exposed via `/metrics`.
-- **Docker Ready**: Complete orchestrator setup for the API, Prometheus data-scraper, and Grafana dashboard out-of-the-box.
+## 🚀 Core SRE Features
 
-## Tech Stack
+- **Dynamic Tier Routing**: Uses a heuristics engine to parse prompt intent. Simple queries route to blazing-fast models (`groq/llama-3.1-8b`), while complex queries (e.g. system design) automatically route to heavy models (`groq/llama-3.1-70b`).
+- **Zero-Latency Semantic Caching**: SHA-256 hashes intercepts inbound requests. Identical requests skip the LLM network entirely, serving an exact match directly from Redis memory in `< 0ms` for `$0USD` cost.
+- **Intelligent Failover Resiliency**: Wraps primary model calls in strict `asyncio` timeouts. If a provider throws a quota limit, `503`, or hangs, the router gracefully degrades to alternative models before ever throwing an error to the user.
+- **Vite SRE Telemetry Dashboard**: Complete visual interface built without bulky frameworks—utilizing raw CSS glassmorphism, flexbox scaling, and micro-animated charts showcasing true request latency and cost updates on every stream.
+- **DDoS/Billing Defense**: Implements a Redis token-bucket API rate limiter (50 req/min) requiring an `x-api-key` header to prevent billing exhaustion.
+- **Prometheus & Grafana Observability**: Instrumentated with custom Python metrics exposing End-to-End Latency Histograms, LLM Token Cost accumulations, and Routing Cache Hit/Miss rates to `/metrics`.
 
-- **Python 3.11** / **FastAPI**
-- **LiteLLM**: For standardized LLM API integrations and exact cost tracking.
-- **Redis**: For semantic caching and atomic rate-limiting token buckets.
-- **Docker Compose**: For container orchestration.
-- **Prometheus & Grafana**: For deep observability and SRE metrics.
+## 🛠️ Tech Stack & Architecture
 
-## Quickstart
+- **Backend Route Logic**: `Python 3.11`, `FastAPI`, `LiteLLM` (for multi-provider standardization)
+- **Frontend Dashboard**: Raw `HTML5`, Vanilla Base `CSS`, `Vite` Node-Server, `marked.js`
+- **Cache & Memory**: `Redis` alpine container
+- **Orchestration**: `Docker Compose`
+- **Observability**: `Prometheus` (Scraping), `Grafana` (Visualization)
+- **Inference Hardware**: `Groq LPU` (Llama 3.1 models config standard)
 
-1. Clone the repository.
-2. Create a `.env` file and add your target API key (default configured for Gemini):
-   ```env
-   GEMINI_API_KEY="your_api_key_here"
+## ⚡ Quickstart
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/ManikBodamwad/LLM-Latency-Cost-Router.git
+   cd "LLM Latency & Cost router"
    ```
-3. Run the orchestration:
+
+2. **Supply your API Keys:**
+   Create a `.env` file in the root directory:
+   ```env
+   GROQ_API_KEY="gsk_your_groq_key_here"
+   ```
+
+3. **Deploy via Docker Compose:**
    ```bash
    docker compose up -d --build
    ```
 
-### Endpoints
-- **POST `/api/v1/chat/completions`**: Main entrypoint for prompts. 
-  - **Headers**: Requires `x-api-key`. 
-  - **Body**: Expects `{"prompt": "Hello world", "stream": false}`
-- **GET `/metrics`**: Prometheus scraping endpoint.
+4. **Experience the Application:**
+   Open [http://localhost:5173](http://localhost:5173) in your web browser. Type a complex prompt like *"Can you explain the Medallion Architecture?"* and observe the SRE dashboard dynamically tracking the latency, the exact Token Cost, and the routing strategy in real-time.
 
-## Observability
+## 📊 Viewing The Internal Observability Stack
 
-To view the dashboard metrics:
-- **Prometheus Native UI**: `http://localhost:9090`
-- **Grafana Visualization**: `http://localhost:3000` (Login: `admin` / `admin`)
+In addition to the Vite dashboard, you can view the true raw metric stream exactly as an enterprise SRE would:
+- **Prometheus Raw Sink**: `http://localhost:9090`
+- **Grafana Workspace**: `http://localhost:3000` (Login: `admin` / `admin`)
+
+---
+
+*Developed by Manik Bodamwad to solve enterprise-level LLM deployment friction points: Cost Runaway, High Latency, and Provider Downtime.*
