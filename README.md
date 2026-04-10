@@ -6,7 +6,7 @@ Built strictly with **Site Reliability Engineering (SRE)** principles, it implem
 
 ## 🚀 Core SRE Features
 
-- **Dynamic Tier Routing**: Uses a heuristics engine to parse prompt intent. Simple queries route to blazing-fast models (`groq/llama-3.1-8b`), while complex queries (e.g. system design) automatically route to heavy models (`groq/llama-3.1-70b`).
+- **Dynamic Tier Routing**: Uses a heuristics engine to parse prompt intent. Simple queries route to blazing-fast models (`groq/llama-3.1-8b-instant`), while complex queries (e.g. system design, code generation) automatically route to frontier models (`groq/llama-3.3-70b-versatile`).
 - **Zero-Latency Semantic Caching**: SHA-256 hashes intercepts inbound requests. Identical requests skip the LLM network entirely, serving an exact match directly from Redis memory in `< 0ms` for `$0USD` cost.
 - **Intelligent Failover Resiliency**: Wraps primary model calls in strict `asyncio` timeouts. If a provider throws a quota limit, `503`, or hangs, the router gracefully degrades to alternative models before ever throwing an error to the user.
 - **Vite SRE Telemetry Dashboard**: Complete visual interface built without bulky frameworks—utilizing raw CSS glassmorphism, flexbox scaling, and micro-animated charts showcasing true request latency and cost updates on every stream.

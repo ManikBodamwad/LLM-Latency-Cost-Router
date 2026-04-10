@@ -64,8 +64,12 @@ async def verify_api_key(x_api_key: str = Header(...)):
     return x_api_key
 
 def determine_complexity(prompt: str) -> str:
-    complex_keywords = ["analyze", "code", "architecture", "summarize", "complex"]
-    if len(prompt) > 1000:
+    complex_keywords = [
+        "analyze", "code", "architecture", "summarize", "complex",
+        "design", "implement", "algorithm", "microservices", "system",
+        "explain", "compare", "debug", "optimize", "generate", "write"
+    ]
+    if len(prompt) > 500:
         return "complex"
     if any(kw in prompt.lower() for kw in complex_keywords):
         return "complex"
@@ -77,12 +81,12 @@ async def chat_completions(req: ChatRequest, api_key: str = Depends(verify_api_k
     
     if tier == "simple":
         target_model = "groq/llama-3.1-8b-instant"
-        fallback_model = "groq/llama-3.1-8b-instant"
+        fallback_model = "groq/llama-3.3-70b-versatile"
         timeout_seconds = 5.0
     else:
-        target_model = "groq/llama-3.1-70b-versatile"
-        fallback_model = "groq/llama-3.1-8b-instant"  
-        timeout_seconds = 10.0
+        target_model = "groq/llama-3.3-70b-versatile"
+        fallback_model = "groq/llama-3.1-8b-instant"
+        timeout_seconds = 15.0
 
     start_time = time.time()
     response = None
